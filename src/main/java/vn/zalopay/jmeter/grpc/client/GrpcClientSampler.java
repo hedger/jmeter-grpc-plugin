@@ -44,6 +44,12 @@ public class GrpcClientSampler extends AbstractSampler implements TestBean, Seri
   private String certFile = Config.CERT_FILE;
   @Setter
   @Getter
+  private String clientKeyFile = Config.CLIENT_KEY_FILE;
+  @Setter
+  @Getter
+  private String clientKeyCertChainFile = Config.CLIENT_KEY_CERT_CHAIN_FILE;
+  @Setter
+  @Getter
   private String packageN = Config.PACKAGE_NAME;
   @Setter
   @Getter

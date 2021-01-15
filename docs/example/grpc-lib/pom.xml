@@ -11,9 +11,16 @@
 	<properties>
 		<grpc.version>1.23.0</grpc.version>		
 		<os-maven-plugin.version>1.4.1.Final</os-maven-plugin.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>		
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.2</version>
+		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-netty</artifactId>

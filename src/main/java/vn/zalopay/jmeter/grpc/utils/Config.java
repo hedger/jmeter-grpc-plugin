@@ -10,6 +10,9 @@ public class Config {
   public static final int PORT = Integer.parseInt(props.getOrDefault("sampler.port", "50051"));
   public static final boolean USE_SSL = Boolean.getBoolean(props.getOrDefault("sampler.use.ssl", "false"));
   public static final String CERT_FILE = props.getOrDefault("sampler.service.cert.file", "");
+  public static final String CLIENT_KEY_FILE = props.getOrDefault("sampler.service.clientkey.file", "");
+  public static final String CLIENT_KEY_CERT_CHAIN_FILE = props.getOrDefault("sampler.service.clientkey.certchainfile",
+      "");
   public static final String PACKAGE_NAME = props.getOrDefault("sampler.package.name", "io.grpc.examples.helloworld");
   public static final String SERVICE = props.getOrDefault("sampler.service.name", "Greeter");
   public static final String METHOD = props.getOrDefault("sampler.method.name", "sayHello");

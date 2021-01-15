@@ -6,15 +6,15 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
 import io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
-import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.apache.commons.lang3.StringUtils;
 import vn.zalopay.jmeter.grpc.client.GrpcClientInterceptor;
 import vn.zalopay.jmeter.grpc.client.GrpcClientSampler;
 import vn.zalopay.jmeter.grpc.compiler.StringGeneratedJavaCompilerFacade;
 import io.grpc.Channel;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.AbstractStub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,7 +155,7 @@ public class GrpcUtils {
   public static ManagedChannel getChannel(GrpcClientSampler sampler) throws SSLException {
     Map<String, String> headerMap = createHeaderMap(sampler.getMetaData());
 
-    ManagedChannelBuilder builder = NettyChannelBuilder.forAddress(sampler.getHostname(), sampler.getPort())
+    NettyChannelBuilder builder = NettyChannelBuilder.forAddress(sampler.getHostname(), sampler.getPort())
         .intercept(new GrpcClientInterceptor(headerMap, sampler.getTimeout()));
 
     if (!sampler.isUseSsl()) {
@@ -168,11 +168,27 @@ public class GrpcUtils {
         LOGGER.error("The cert file passed in does not exist at: ", sampler.getCertFile());
       }
 
+      builder.negotiationType(NegotiationType.TLS);
       // build the client side ssl context with the cert
-      SslContext sslContext = GrpcSslContexts.forClient().trustManager(certFile).build();
+      SslContextBuilder sslContextBuilder = GrpcSslContexts.forClient().trustManager(certFile);
+
+      if (!StringUtils.isBlank(sampler.getClientKeyFile())
+          || !StringUtils.isBlank(sampler.getClientKeyCertChainFile())) {
+        File clientKeyFile = new File(sampler.getClientKeyFile().trim());
+        if (!clientKeyFile.exists()) {
+          LOGGER.error("Client private key file not found: '" + sampler.getClientKeyFile() + "'");
+        }
+
+        File clientKeyCertChainFile = new File(sampler.getClientKeyCertChainFile().trim());
+        if (!clientKeyCertChainFile.exists()) {
+          LOGGER.error("Client private key chain file not found: '" + sampler.getClientKeyCertChainFile() + "'");
+        }
+
+        sslContextBuilder.keyManager(clientKeyCertChainFile, clientKeyFile);
+      }
 
       // add the ssl context to the builder
-      builder = ((NettyChannelBuilder) builder).sslContext(sslContext);
+      builder.sslContext(sslContextBuilder.build());
     }
     return builder.build();
   }
